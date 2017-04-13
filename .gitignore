@@ -6,6 +6,11 @@ npm-debug.log
 gsheets.config.js
 
 # Typescript built files
-lib/**/*.js
-!lib/chart/**
+lib/sheets/*.js
+lib/oauth/*.js
+lib/drive/*.js
+lib/utils/*.js
+lib/expectations.js
+lib/upload.js
+lib/metrics.js
 types/types.js

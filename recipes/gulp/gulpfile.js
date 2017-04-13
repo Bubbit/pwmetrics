@@ -5,32 +5,25 @@
 const gulp = require('gulp');
 const connect = require('gulp-connect');
 const PWMetrics = require('../../lib/');
-const PORT = 8080;
+const port = 8080;
 
-/**
- * Start server
- */
-const startServer = function() {
+const connectServer = function() {
   return connect.server({
     root: '../public',
     livereload: true,
-    port: PORT
+    port: port
   });
 };
 
-/**
- * Stop server
- */
-const stopServer = function() {
-  connect.serverClose();
-};
+function handleError() {
+  process.exit(1);
+}
 
-/**
- * Run pwmetrics
- */
-const runPwmetrics = function() {
-  const url = `http://localhost:${PORT}/index.html`;
-  return new PWMetrics(url, {
+gulp.task('pwmetrics', function() {
+  connectServer();
+
+  const url = `http://localhost:${port}/index.html`;
+  const pwMetrics = new PWMetrics(url, {
     flags: {
       expectations: true
     },
@@ -48,32 +41,12 @@ const runPwmetrics = function() {
         error: '>=2000'
       }
     }
-  }).start();
-};
-
-/**
- * Handle ok result
- * @param {Object} results - Pwmetrics results obtained through Lighthouse
- */
-const handleOk = function(results) {
-  stopServer();
-  return results;
-};
-
-/**
- * Handle error
- */
-const handleError = function(e) {
-  stopServer();
-  console.error(e); // eslint-disable-line no-console
-  throw e; // Throw to exit process with status 1.
-};
-
-gulp.task('pwmetrics', function() {
-  startServer();
-  return runPwmetrics()
-    .then(handleOk)
-    .catch(handleError);
+  });
+  return pwMetrics.start()
+    .then(_ => {
+      connect.serverClose();
+    })
+    .catch(_ => handleError);
 });
 
 gulp.task('default', ['pwmetrics']);

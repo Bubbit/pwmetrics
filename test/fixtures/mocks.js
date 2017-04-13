@@ -13,8 +13,6 @@ exports.metricsResult = {
   url: url
 };
 
-exports.failedMetricResult = new Error('Failed run');
-
 exports.metricsResults = [
   {
     'timings': [
@@ -245,6 +243,7 @@ exports.metricsResults = [
     'url': 'http://example.com/'
   }
 ];
+
 
 module.exports.googleOauthCredentials = {
   installed: {

@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-  url: 'https://example.com/',
+  url: 'http://example.com/',
   flags: {
     expectations: true,
     runs: 2,

@@ -48,7 +48,6 @@ describe('PWMetrics', () => {
     let runStub;
     let findMedianRunStub;
     let displayOutputStub;
-    let runResult;
 
     describe('with one run', () => {
       beforeEach(() => {
@@ -87,6 +86,8 @@ describe('PWMetrics', () => {
     });
 
     describe('with more then one run', () => {
+      let runResult;
+
       beforeEach(() => {
         const medianResult = dataMocks.metricsResult;
         runResult = dataMocks.metricsResult;
@@ -111,42 +112,25 @@ describe('PWMetrics', () => {
       });
     });
 
-    describe('with only failed runs', () => {
-      beforeEach(() => {
-        const medianResult = dataMocks.metricsResult;
-        runResult = dataMocks.failedMetricResult;
+    describe('findMedianRun', () => {
+      const pwMetrics = new PWMetrics(runOptions.startWithOneRun.url, runOptions.startWithMoreThenOneRun.opts);
+      const runs = dataMocks.metricsResults;
 
-        pwMetrics = new PWMetrics(runOptions.startWithOneRun.url, runOptions.startWithMoreThenOneRun.opts);
-        runStub = sinon.stub(pwMetrics, 'run', () => Promise.reject(runResult));
-        findMedianRunStub = sinon.stub(pwMetrics, 'findMedianRun', () => medianResult);
+      it('for 1 run, return only element', () => {
+        expect(pwMetrics.findMedianRun([runs[0]])).to.be.deep.equal(runs[0]);
       });
 
-      it('should not call findMedianRun', () => {
-        return pwMetrics.start().then(_ => {
-          expect(findMedianRunStub).to.not.have.been.called;
-        });
+      it('for 2 runs, return largest element', () => {
+        expect(pwMetrics.findMedianRun([runs[0], runs[1]])).to.be.deep.equal(runs[1]);
       });
-    });
-  });
 
-  describe('findMedianRun method', () => {
-    const pwMetrics = new PWMetrics(runOptions.startWithOneRun.url, runOptions.startWithMoreThenOneRun.opts);
-    const runs = dataMocks.metricsResults;
+      it('for odd number of runs, return middle element of sorted array', () => {
+        expect(pwMetrics.findMedianRun([runs[0], runs[1], runs[2]])).to.be.deep.equal(runs[1]);
+      });
 
-    it('for 1 run, return only element', () => {
-      expect(pwMetrics.findMedianRun([runs[0]])).to.be.deep.equal(runs[0]);
-    });
-
-    it('for 2 runs, return largest element', () => {
-      expect(pwMetrics.findMedianRun([runs[0], runs[1]])).to.be.deep.equal(runs[1]);
-    });
-
-    it('for odd number of runs, return middle element of sorted array', () => {
-      expect(pwMetrics.findMedianRun([runs[0], runs[1], runs[2]])).to.be.deep.equal(runs[1]);
-    });
-
-    it('for even runs, return n/2+1 element element of sorted array', () => {
-      expect(pwMetrics.findMedianRun(runs)).to.be.deep.equal(runs[2]);
+      it('for even runs, return n/2+1 element element of sorted array', () => {
+        expect(pwMetrics.findMedianRun(runs)).to.be.deep.equal(runs[2]);
+      });
     });
   });
 });
